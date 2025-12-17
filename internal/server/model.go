@@ -6,3 +6,9 @@ type Server struct {
 	IsHealthy bool
 	Url       string
 }
+
+type Registry struct {
+	Name     string
+	Url      string
+	IsActive bool
+}
