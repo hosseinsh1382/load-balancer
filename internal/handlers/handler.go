@@ -8,12 +8,12 @@ import (
 )
 
 type handler struct {
-	proxyHandler proxy.ProxyHandler
+	proxyHandler proxy.Handler
 	errorLogger  *log.Logger
 	infoLogger   *log.Logger
 }
 
-func NewHandler(proxyHandler proxy.ProxyHandler, errorLogger *log.Logger, infoLogger *log.Logger) *handler {
+func NewHandler(proxyHandler proxy.Handler, errorLogger *log.Logger, infoLogger *log.Logger) *handler {
 	return &handler{
 		proxyHandler: proxyHandler,
 		errorLogger:  errorLogger,
@@ -22,7 +22,9 @@ func NewHandler(proxyHandler proxy.ProxyHandler, errorLogger *log.Logger, infoLo
 }
 
 func (h *handler) HandleAll(c *gin.Context) {
-	err := h.proxyHandler.Connect(c)
+	chn := make(chan error)
+	go h.proxyHandler.Connect(c, chn)
+	err := <-chn
 	if err != nil {
 		log.Println(err)
 	}

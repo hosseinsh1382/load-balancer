@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"LoadBalancer/internal/selector"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -18,11 +19,11 @@ func NewProxyHandler(s selector.Selector) *DefaultProxyHandler {
 	return &DefaultProxyHandler{selector: s}
 }
 
-func (p *DefaultProxyHandler) Connect(c *gin.Context) error {
+func (p *DefaultProxyHandler) Connect(c *gin.Context, chn chan error) {
 	log.Println("[ProxyHandler] Connect")
 	server, err := p.selector.Select()
 	if err != nil {
-		log.Println(err)
+		chn <- fmt.Errorf("[ProxyHandler] Error in Server selection: %v", err)
 	}
 	target, err := url.Parse(server)
 	proxy := httputil.NewSingleHostReverseProxy(target)
@@ -38,5 +39,5 @@ func (p *DefaultProxyHandler) Connect(c *gin.Context) error {
 		c.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
 	}
 	proxy.ServeHTTP(c.Writer, c.Request)
-	return nil
+	chn <- nil
 }

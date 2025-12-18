@@ -2,6 +2,6 @@ package proxy
 
 import "github.com/gin-gonic/gin"
 
-type ProxyHandler interface {
-	Connect(c *gin.Context) error
+type Handler interface {
+	Connect(c *gin.Context, chn chan error)
 }
