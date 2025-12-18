@@ -10,15 +10,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ProxyHandler struct {
+type DefaultProxyHandler struct {
 	selector selector.Selector
 }
 
-func NewProxyHandler(s selector.Selector) *ProxyHandler {
-	return &ProxyHandler{selector: s}
+func NewProxyHandler(s selector.Selector) *DefaultProxyHandler {
+	return &DefaultProxyHandler{selector: s}
 }
 
-func (p *ProxyHandler) Connect(c *gin.Context) error {
+func (p *DefaultProxyHandler) Connect(c *gin.Context) error {
 	log.Println("[ProxyHandler] Connect")
 	server, err := p.selector.Select()
 	if err != nil {
@@ -32,6 +32,7 @@ func (p *ProxyHandler) Connect(c *gin.Context) error {
 		req.Host = target.Host
 		req.Header.Set("X-Forwarded-Host", req.Host)
 	}
+	log.Println(target.Host)
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
 		log.Printf("Proxy Error: %v", err)
 		c.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})

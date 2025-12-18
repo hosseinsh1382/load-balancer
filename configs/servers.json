@@ -1,0 +1,12 @@
+[
+  {
+    "url": "http://localhost:8083",
+    "name": "first",
+    "isActive": true
+  },
+  {
+    "url": "http://localhost:8084",
+    "name": "first",
+    "isActive": true
+  }
+]

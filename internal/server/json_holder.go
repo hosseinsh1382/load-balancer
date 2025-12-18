@@ -3,11 +3,11 @@ package server
 import "LoadBalancer/pkg"
 
 type JsonHolder struct {
-	jsonReader pkg.JsonReader[[]Server]
+	jsonReader pkg.JsonReader[[]Registry]
 	servers    []Server
 }
 
-func NewJsonHolder(reader pkg.JsonReader[[]Server]) *JsonHolder {
+func NewJsonHolder(reader pkg.JsonReader[[]Registry]) *JsonHolder {
 	j := &JsonHolder{
 		jsonReader: reader,
 	}
@@ -19,11 +19,19 @@ func NewJsonHolder(reader pkg.JsonReader[[]Server]) *JsonHolder {
 }
 
 func (j *JsonHolder) UpdateServers() error {
-	s, err := j.jsonReader.ReadJson()
+	registries, err := j.jsonReader.ReadJson()
 	if err != nil {
 		return err
 	}
-	j.servers = s
+	for _, r := range registries {
+		s := Server{
+			Name:      r.Name,
+			IsActive:  r.IsActive,
+			IsHealthy: true,
+			Url:       r.Url,
+		}
+		j.servers = append(j.servers, s)
+	}
 	return nil
 }
 func (j *JsonHolder) Servers() ([]Server, error) {

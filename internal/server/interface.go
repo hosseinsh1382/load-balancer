@@ -1,6 +1,6 @@
 package server
 
 type Holder interface {
-	GetServers() ([]Server, error)
-	UpdateServer() error
+	Servers() ([]Server, error)
+	UpdateServers() error
 }
