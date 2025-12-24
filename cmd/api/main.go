@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,7 +22,10 @@ func main() {
 	errorLogger := log.New(os.Stderr, "ERROR ", log.Ldate|log.Ltime|log.Lshortfile)
 	infoLogger := log.New(os.Stdout, "INFO  ", log.Ldate|log.Ltime|log.Lshortfile)
 	r := pkg.NewDefaultJsonReader[[]server.Registry]("./configs/servers.json")
-	hl := server.NewJsonHolder(r)
+	helathChecker := server.NewDefaultHealthChecker()
+	hl := server.NewJsonHolder(r, helathChecker)
+	healthWorker := server.NewHealthWorker(hl, helathChecker, 20*time.Second)
+	go healthWorker.Start()
 	s := selector.NewRoundRobin(hl)
 	p := proxy.NewProxyHandler(s)
 	h := handlers.NewHandler(p, errorLogger, infoLogger)

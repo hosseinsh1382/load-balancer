@@ -24,6 +24,7 @@ func (p *DefaultProxyHandler) Connect(c *gin.Context, chn chan error) {
 	server, err := p.selector.Select()
 	if err != nil {
 		chn <- fmt.Errorf("[ProxyHandler] Error in Server selection: %v", err)
+		return
 	}
 	target, err := url.Parse(server)
 	proxy := httputil.NewSingleHostReverseProxy(target)
